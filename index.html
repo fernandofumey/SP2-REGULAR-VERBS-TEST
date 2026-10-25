@@ -1,1188 +1,518 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" translate="no" class="notranslate">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jorge Luis Borges - The Mirror Man</title>
-    
-    <!-- Tailwind CSS for styling -->
+    <meta name="google" content="notranslate">
+    <title>Regular Spanish Verbs Test</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React and ReactDOM -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    
-    <!-- Babel for JSX compilation in the browser -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        /* Anti-AI & Anti-Selection Guardrails */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            font-family: 'Inter', sans-serif;
+        }
+        input[type="radio"] {
+            transform: scale(1.2);
+            margin-right: 12px;
+            cursor: pointer;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 1.1rem;
+            border-radius: 0.75rem;
+            border: 2px solid #bae6fd;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-label:hover {
+            border-color: #0284c7;
+            background-color: #f0f9ff;
+        }
+        input[type="radio"]:checked + .option-text {
+            font-weight: bold;
+            color: #0369a1;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex items-start sm:items-center justify-center p-4 py-10 selection:bg-blue-500/30">
-    <div id="root" class="w-full max-w-5xl"></div>
+<body class="bg-sky-50 text-sky-950 min-h-screen flex flex-col items-center justify-center p-4" oncontextmenu="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;">
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+    <div id="app-container" class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden relative border border-sky-100">
+        
+        <!-- Header -->
+        <div class="bg-sky-600 p-6 text-white text-center">
+            <h1 class="text-3xl font-bold tracking-wide">Regular Spanish Verbs Test</h1>
+            <p class="text-sky-100 mt-2">Comprehensive 50-Question Evaluation (StudySpanish: Regular Verbs I, II & III)</p>
+        </div>
 
-        // 47 minutes, 33 seconds in seconds (full video duration)
-        const MAX_ALLOWED_TIME = 2853; 
-        const VIDEO_ID = 'yCKgf6liXvQ';
+        <!-- Start Screen: Student Info Entry -->
+        <div id="start-screen" class="p-8">
+            <form id="student-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">First Name</label>
+                        <input type="text" id="fname" required class="w-full border-2 border-sky-200 rounded-lg p-3 focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Last Name</label>
+                        <input type="text" id="lname" required class="w-full border-2 border-sky-200 rounded-lg p-3 focus:outline-none focus:border-sky-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">School Email / ID (Alphanumeric allowed)</label>
+                    <input type="text" id="email" required class="w-full border-2 border-sky-200 rounded-lg p-3 focus:outline-none focus:border-sky-500">
+                    <p class="text-xs text-red-500 mt-1 hidden" id="email-error">This email or ID has already submitted a test attempt.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Period</label>
+                    <select id="period" required class="w-full border-2 border-sky-200 rounded-lg p-3 focus:outline-none focus:border-sky-500 bg-white">
+                        <option value="" disabled selected>Select your period...</option>
+                        <option value="1st">1st</option>
+                        <option value="A2">A2</option>
+                        <option value="A4">A4</option>
+                        <option value="B2">B2</option>
+                        <option value="B3">B3</option>
+                        <option value="5th">5th</option>
+                    </select>
+                </div>
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-200 text-lg">
+                        Begin Test
+                    </button>
+                    <p class="text-xs text-center text-red-600 mt-3 font-semibold">
+                        ⚠️ Warning: Leaving the active browser window, switching tabs, clicking outside the active window, or moving your cursor outside triggers a cheating alert!
+                    </p>
+                </div>
+            </form>
+        </div>
 
-        // 20 Questions strictly synchronized to the Borges transcript + 3 seconds total delay
-        const QUIZ_QUESTIONS = [
-            { id: 1, timestamp: 50, text: "At what age was Jorge Luis Borges already destined to be a writer?", options: ["Nine", "Fifteen", "Twenty-one", "Thirty"], correctIndex: 0 },
-            { id: 2, timestamp: 85, text: "When did international fame finally reach Borges?", options: ["In his twenties", "In his sixties when he was already blind", "After his death", "During World War I"], correctIndex: 1 },
-            { id: 3, timestamp: 145, text: "Which major literary award always escaped Borges despite winning 46 others?", options: ["The Pulitzer Prize", "The Cervantes Prize", "The Nobel Prize for Literature", "The Formentor Prize"], correctIndex: 2 },
-            { id: 4, timestamp: 186, text: "In what city was Jorge Luis Borges born?", options: ["Madrid", "Geneva", "Buenos Aires", "Lima"], correctIndex: 2 },
-            { id: 5, timestamp: 210, text: "Where did Borges discover his endless love and pleasure for books?", options: ["In his school's library", "In his father's library", "At the National Library", "In a local bookstore"], correctIndex: 1 },
-            { id: 6, timestamp: 252, text: "What was the profession of Borges' father?", options: ["A lawyer who dreamed of being a writer", "A professional poet", "A politician", "A famous architect"], correctIndex: 0 },
-            { id: 7, timestamp: 362, text: "What did the young Borges fear more than anything else in his house?", options: ["The dark basement", "Spiders", "Mirrors and reflections", "Loud noises"], correctIndex: 2 },
-            { id: 8, timestamp: 423, text: "Which animal at the zoo fascinated Borges and symbolized an adventurous life?", options: ["The Lion", "The Elephant", "The Tiger", "The Bear"], correctIndex: 2 },
-            { id: 9, timestamp: 565, text: "Why did the Borges family move to Geneva, Switzerland?", options: ["To escape a war in Argentina", "To consult a specialist for his father's failing eyesight", "To find a publisher for Borges' book", "To start a new business"], correctIndex: 1 },
-            { id: 10, timestamp: 587, text: "What major global event kept the Borges family in Europe longer than expected?", options: ["The Spanish Civil War", "World War I", "World War II", "The Great Depression"], correctIndex: 1 },
-            { id: 11, timestamp: 663, text: "What was the title of Borges' first book of poems, inspired by his return to his hometown?", options: ["Ficciones", "The Aleph", "Fervor de Buenos Aires", "Labyrinths"], correctIndex: 2 },
-            { id: 12, timestamp: 980, text: "According to Borges, how does a real peasant or gaucho view the landscape?", options: ["For its aesthetic beauty", "As a place of spiritual reflection", "For its practicalities, like checking the weather", "As something to be conquered"], correctIndex: 2 },
-            { id: 13, timestamp: 1175, text: "What literary movement did Borges embrace in Spain that believed the metaphor was the essence of poetry?", options: ["Surrealism", "Ultraism", "Romanticism", "Realism"], correctIndex: 1 },
-            { id: 14, timestamp: 1205, text: "Who was the young writer Borges famously collaborated with under the pseudonym Bustos Domecq?", options: ["Gabriel García Márquez", "Julio Cortázar", "Adolfo Bioy Casares", "Victoria Ocampo"], correctIndex: 2 },
-            { id: 15, timestamp: 1507, text: "Where did Borges work to financially support his family after his father's death?", options: ["At a university as a professor", "At a small municipal library", "At a local newspaper", "At a law firm"], correctIndex: 1 },
-            { id: 16, timestamp: 1561, text: "What near-fatal accident did Borges suffer in 1938?", options: ["He was in a train crash", "He hit his head on an open, freshly painted window", "He fell off a horse", "He was caught in a street fight"], correctIndex: 1 },
-            { id: 17, timestamp: 1628, text: "What famous short story did Borges write to test if he had lost his mental abilities after his head injury?", options: ["The South", "The Library of Babel", "Pierre Menard, Author of Don Quixote", "The Circular Ruins"], correctIndex: 2 },
-            { id: 18, timestamp: 2136, text: "What prestigious position was Borges appointed to in 1955 after the fall of Perón?", options: ["Minister of Culture", "Director of the National Library", "President of the University", "Ambassador to Spain"], correctIndex: 1 },
-            { id: 19, timestamp: 2157, text: "What ironic fate did Borges share with two previous directors of the National Library?", options: ["They were all exiled", "They all went blind", "They all wrote the same book", "They were all from Geneva"], correctIndex: 1 },
-            { id: 20, timestamp: 2657, text: "In which city did Borges choose to spend his final days and die?", options: ["Buenos Aires", "Madrid", "Paris", "Geneva"], correctIndex: 3 }
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="p-8 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <span id="question-tracker" class="text-sm font-bold bg-sky-100 text-sky-800 py-1 px-3 rounded-full">Question 1 / 50</span>
+                <span id="cheat-counter-display" class="text-sm font-bold text-red-500">Alerts: <span id="cheat-number">0</span></span>
+            </div>
+            
+            <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                <h2 id="question-text" class="text-2xl font-bold text-sky-950 select-none flex-1"></h2>
+                <button id="btn-read-aloud" type="button" class="flex-shrink-0 flex items-center gap-2 bg-sky-100 hover:bg-sky-200 text-sky-700 py-2 px-4 rounded-lg text-sm font-bold transition border border-sky-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                        <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 0 0 1.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06ZM18.584 5.106a.75.75 0 0 1 1.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 0 1-1.06-1.06 8.25 8.25 0 0 0 0-11.668.75.75 0 0 1 0-1.06Z" />
+                        <path d="M15.932 7.757a.75.75 0 0 1 1.061 0 6 6 0 0 1 0 8.486.75.75 0 0 1-1.06-1.061 4.5 4.5 0 0 0 0-6.364.75.75 0 0 1 0-1.06Z" />
+                    </svg>
+                    Read-Aloud
+                </button>
+            </div>
+            
+            <div id="options-container" class="space-y-3 mb-8">
+                <!-- Dynamic Options Injection -->
+            </div>
+            
+            <div class="flex justify-between">
+                <button id="btn-back" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg transition duration-200">
+                    Back
+                </button>
+                <button id="btn-next" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-8 rounded-lg shadow-md transition duration-200">
+                    Next
+                </button>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="p-8 hidden text-center">
+            <div class="text-6xl mb-4">🎉</div>
+            <h2 class="text-3xl font-bold mb-4 text-sky-900">Test Submitted Successfully!</h2>
+            <p class="text-lg mb-6">Your record has been securely submitted to the teacher's grade sheet. Your personal record CSV file has also downloaded automatically.</p>
+            <div class="bg-sky-50 border border-sky-200 rounded-lg p-6 mb-8 inline-block">
+                <p class="text-sm text-gray-600 mb-1">Final Percentage Score</p>
+                <p id="final-score" class="text-4xl font-bold text-sky-600"></p>
+            </div>
+            <div>
+                <button id="btn-refresh" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition duration-200">
+                    Start Over (New Student)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cheating Modal Warning -->
+    <div id="cheat-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-8 max-w-sm w-full text-center shadow-2xl">
+            <div class="text-red-500 text-5xl mb-4">⚠️</div>
+            <h2 class="text-2xl font-bold text-red-600 mb-2">Cheating Detected!</h2>
+            <p class="text-gray-700 mb-6">You left the active test window, navigated away, clicked outside the designated area, or switched tabs. This incident has been logged.</p>
+            <button id="btn-cheat-ok" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg w-full">
+                I Understand
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 50 Question Master Bank covering StudySpanish lessons (Regular Verbs I, II, and III)
+        const rawQuestions = [
+            // Core Concepts & Infinitives (RegVerb I)
+            { q: "In Spanish, all infinitives (the base form of a verb) end in which three combinations of letters?", correct: "-ar, -er, or -ir", distractors: ["-o, -a, or -e", "-as, -es, or -is", "-an, -en, or -in"] },
+            { q: "What are the three model regular verbs introduced in the StudySpanish lessons?", correct: "hablar, comer, vivir", distractors: ["ser, estar, ir", "hablar, beber, escribir", "caminar, correr, abrir"] },
+            { q: "What does the model verb 'hablar' mean in English?", correct: "to speak", distractors: ["to eat", "to live", "to walk"] },
+            { q: "What does the model verb 'comer' mean in English?", correct: "to eat", distractors: ["to drink", "to speak", "to run"] },
+            { q: "What does the model verb 'vivir' mean in English?", correct: "to live", distractors: ["to write", "to open", "to eat"] },
+            { q: "To conjugate any regular verb for 'yo' (I) in the present tense, you drop the infinitive ending and add:", correct: "-o", distractors: ["-a", "-e", "-as"] },
+            { q: "The Spanish present indicative tense 'Yo hablo inglés' can be translated into English in which three ways?", correct: "I speak English, I do speak English, I am speaking English", distractors: ["I speak English, I spoke English, I will speak English", "I speak English, I can speak English, I want to speak English", "I speak English, I have spoken English, I used to speak English"] },
+
+            // Conjugations: Yo, Usted, Nosotros/as, Ustedes (RegVerb I)
+            { q: "Choose the correct conjugation for 'I speak':", correct: "yo hablo", distractors: ["yo habla", "yo hablas", "yo hablamos"] },
+            { q: "Choose the correct conjugation for 'I eat':", correct: "yo como", distractors: ["yo come", "yo comes", "yo comemos"] },
+            { q: "Choose the correct conjugation for 'I live':", correct: "yo vivo", distractors: ["yo vive", "yo vives", "yo vivimos"] },
+            { q: "Choose the correct conjugation for 'you (formal) speak':", correct: "usted habla", distractors: ["usted hablas", "usted hablo", "usted hablan"] },
+            { q: "Choose the correct conjugation for 'you (formal) eat':", correct: "usted come", distractors: ["usted comes", "usted como", "usted comen"] },
+            { q: "Choose the correct conjugation for 'you (formal) live':", correct: "usted vive", distractors: ["usted vives", "usted vivo", "usted viven"] },
+            { q: "If the subject is 'nosotros/as' (we), what endings are added to -ar, -er, and -ir verbs respectively?", correct: "-amos, -emos, -imos", distractors: ["-amos, -emos, -emos", "-an, -en, -en", "-as, -es, -es"] },
+            { q: "Choose the correct conjugation for 'we speak':", correct: "nosotros hablamos", distractors: ["nosotros habemos", "nosotros hablomos", "nosotros hablan"] },
+            { q: "Choose the correct conjugation for 'we eat':", correct: "nosotros comemos", distractors: ["nosotros comamos", "nosotros comimos", "nosotros comen"] },
+            { q: "Choose the correct conjugation for 'we live':", correct: "nosotros vivimos", distractors: ["nosotros vivemos", "nosotros vivamos", "nosotros viven"] },
+            { q: "Choose the correct conjugation for 'you-all (formal) speak':", correct: "ustedes hablan", distractors: ["ustedes hablen", "ustedes habla", "ustedes hablamos"] },
+            { q: "Choose the correct conjugation for 'you-all (formal) eat':", correct: "ustedes comen", distractors: ["ustedes coman", "ustedes come", "ustedes comemos"] },
+            { q: "Choose the correct conjugation for 'you-all (formal) live':", correct: "ustedes viven", distractors: ["ustedes vivan", "ustedes vive", "ustedes vivimos"] },
+
+            // Conjugations: Tú, Él/Ella, Ellos/Ellas (RegVerb II)
+            { q: "If the subject is 'tú' (you familiar), what ending do you add to a regular -ar verb?", correct: "-as", distractors: ["-es", "-a", "-an"] },
+            { q: "If the subject is 'tú' (you familiar), what ending do you add to regular -er and -ir verbs?", correct: "-es", distractors: ["-as", "-is", "-e"] },
+            { q: "Choose the correct conjugation for 'you (familiar) speak':", correct: "tú hablas", distractors: ["tú habla", "tú hables", "tú hablo"] },
+            { q: "Choose the correct conjugation for 'you (familiar) eat':", correct: "tú comes", distractors: ["tú come", "tú comas", "tú como"] },
+            { q: "Choose the correct conjugation for 'you (familiar) live':", correct: "tú vives", distractors: ["tú vivas", "tú vivis", "tú vive"] },
+            { q: "Which subject pronouns share the exact same verb conjugation endings as 'usted'?", correct: "él and ella", distractors: ["tú and yo", "ellos and ellas", "nosotros and nosotras"] },
+            { q: "Which subject pronouns share the exact same verb conjugation endings as 'ustedes'?", correct: "ellos and ellas", distractors: ["él and ella", "nosotros and nosotras", "tú and yo"] },
+            { q: "If the subject is 'él' or 'ella' (he/she), what endings are added to regular -ar, -er, and -ir verbs respectively?", correct: "-a, -e, -e", distractors: ["-as, -es, -es", "-o, -o, -o", "-an, -en, -en"] },
+            { q: "If the subject is 'ellos' or 'ellas' (they), what endings are added to regular -ar, -er, and -ir verbs respectively?", correct: "-an, -en, -en", distractors: ["-a, -e, -e", "-amos, -emos, -imos", "-as, -es, -es"] },
+            { q: "Choose the correct conjugation for 'he speaks' and 'she eats':", correct: "él habla / ella come", distractors: ["él hablas / ella comes", "él hablo / ella como", "él hablan / ella comen"] },
+            { q: "Choose the correct conjugation for 'they (masculine) eat':", correct: "ellos comen", distractors: ["ellos coman", "ellos come", "ellos comemos"] },
+            { q: "Choose the correct conjugation for 'they (feminine) live':", correct: "ellas viven", distractors: ["ellas vivan", "ellas vive", "ellas vivimos"] },
+
+            // Rules & Two-Verb Constructions (RegVerb III)
+            { q: "Why are subject pronouns (like 'yo', 'tú', 'nosotros') often omitted in Spanish sentences?", correct: "Because the verb endings already indicate who is performing the action.", distractors: ["Because subject pronouns are only used in questions.", "Because using subject pronouns is considered rude.", "Because subject pronouns are only used with irregular verbs."] },
+            { q: "Why might a speaker choose to include the subject pronoun with the verb form 'habla' (e.g., 'él habla', 'ella habla', 'Ud. habla')?", correct: "For clarification, because 'habla' is ambiguous and can mean he, she, or you (formal).", distractors: ["Because 'hablar' is an irregular verb.", "Because 'habla' is in the past tense.", "Because a sentence is grammatically incorrect without a pronoun."] },
+            { q: "In the sentence 'Yo como pan y tú comes arroz', why are the subject pronouns 'yo' and 'tú' included?", correct: "To add emphasis and contrast.", distractors: ["Because 'como' and 'comes' have the exact same ending.", "Because 'comer' requires a pronoun at all times.", "Because both verbs are in the infinitive form."] },
+            { q: "When two verbs are used in a row in Spanish (such as 'I need to speak'), how are they structured?", correct: "The first verb is conjugated, and the second verb remains in the infinitive form.", distractors: ["Both verbs are conjugated to match the subject.", "The first verb remains in the infinitive, and the second verb is conjugated.", "Both verbs remain in the infinitive form."] },
+            { q: "Translate using the two-verb rule: 'I need to speak with Alfredo.'", correct: "Necesito hablar con Alfredo.", distractors: ["Necesito hablo con Alfredo.", "Necesitar hablo con Alfredo.", "Necesitas hablar con Alfredo."] },
+            { q: "Translate using the two-verb rule: 'You (familiar) wish to live in Spain.'", correct: "Deseas vivir en España.", distractors: ["Deseas vives en España.", "Desea vivir en España.", "Deseamos vivir en España."] },
+
+            // Common Regular Verbs Vocabulary & Application (RegVerb III)
+            { q: "What do the common regular -ar verbs 'comprar', 'trabajar', and 'estudiar' mean?", correct: "to buy, to work, to study", distractors: ["to cook, to walk, to listen", "to rent, to pay, to teach", "to sing, to dance, to travel"] },
+            { q: "What do the common regular -ar verbs 'buscar', 'escuchar', and 'mirar' mean?", correct: "to look for, to listen to, to watch/look at", distractors: ["to touch, to take, to wait for", "to help, to enter, to arrive", "to call, to forget, to ask"] },
+            { q: "What is the meaning of the regular -ar verb 'esperar'?", correct: "to hope / to wait for", distractors: ["to listen to", "to forget", "to spend money"] },
+            { q: "What is the meaning of the regular -ar verb 'llegar'?", correct: "to arrive", distractors: ["to wear / to carry", "to wash", "to leave / to allow"] },
+            { q: "What is the meaning of the regular -ar verb 'llevar'?", correct: "to wear / to carry", distractors: ["to arrive", "to wash", "to rent"] },
+            { q: "What is the meaning of the regular -ar verb 'tomar'?", correct: "to take / to drink", distractors: ["to touch / to play an instrument", "to work", "to fear"] },
+            { q: "What do the common regular -er verbs 'aprender', 'beber', and 'leer' mean?", correct: "to learn, to drink, to read", distractors: ["to believe, to owe, to run", "to understand, to sell, to break", "to promise, to hide, to fear"] },
+            { q: "What do the common regular -er verbs 'comprender', 'correr', and 'vender' mean?", correct: "to understand, to run, to sell", distractors: ["to learn, to eat, to read", "to believe, to drink, to break", "to owe, to hide, to promise"] },
+            { q: "What do the common regular -ir verbs 'abrir', 'escribir', and 'recibir' mean?", correct: "to open, to write, to receive", distractors: ["to admit, to decide, to suffer", "to attend, to climb, to live", "to cover, to describe, to permit"] },
+            { q: "What is the meaning of the regular -ir verb 'asistir a'?", correct: "to attend", distractors: ["to help", "to admit", "to divide"] },
+            { q: "What is the meaning of the regular -ir verb 'subir'?", correct: "to climb / to go up", distractors: ["to suffer", "to cover", "to unite"] },
+            { q: "Choose the correct translation for: 'We learn Spanish and they write letters.'", correct: "Aprendemos español y ellos escriben cartas.", distractors: ["Aprendamos español y ellos escriban cartas.", "Aprendemos español y ellos escribimos cartas.", "Aprende español y ellos escriben cartas."] }
         ];
 
-        // Salt for Local Storage obfuscation
-        const SALT = "borges_v2_";
-
-        // Safe Unicode-compatible Base64 encoding
-        const encodeBase64 = (str) => {
-            try { return btoa(unescape(encodeURIComponent(str))); } catch(e) { return btoa(str); }
-        };
-        const decodeBase64 = (str) => {
-            try { return decodeURIComponent(escape(atob(str))); } catch(e) { return atob(str); }
-        };
-
-        const getSavedNum = (key) => {
-            try {
-                const saved = localStorage.getItem(key);
-                if (saved) return parseFloat(decodeBase64(saved).replace(SALT, '')) || 0;
-            } catch(e) {}
-            return 0;
-        };
+        let quizQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = {}; 
+        let cheatCount = 0;
+        let studentData = {};
         
-        const getSavedStr = (key) => {
-            try {
-                const saved = localStorage.getItem(key);
-                if (saved) return decodeBase64(saved).replace(SALT, '');
-            } catch(e) {}
-            return "";
-        };
+        // Track the start time
+        let testStartTime = null;
 
-        const getSavedAnswers = () => {
-            try {
-                const saved = localStorage.getItem('borges_video_answers_hash');
-                if (saved) return JSON.parse(decodeBase64(saved).replace(SALT, ''));
-            } catch(e) {}
-            return {};
-        };
+        // Unique local storage key for Regular Verbs Test
+        let submittedEmails = JSON.parse(localStorage.getItem('submitted_reg_verbs_emails') || '[]');
 
-        const TEACHER_PIN = "1234";
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const endScreen = document.getElementById('end-screen');
+        const studentForm = document.getElementById('student-form');
+        const questionTracker = document.getElementById('question-tracker');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const btnBack = document.getElementById('btn-back');
+        const btnNext = document.getElementById('btn-next');
+        const cheatModal = document.getElementById('cheat-modal');
+        const cheatNumber = document.getElementById('cheat-number');
+        const btnCheatOk = document.getElementById('btn-cheat-ok');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const btnRefresh = document.getElementById('btn-refresh');
+        const emailInput = document.getElementById('email');
+        const emailError = document.getElementById('email-error');
+        const btnReadAloud = document.getElementById('btn-read-aloud');
 
-        const App = () => {
-            const [view, setView] = useState('instructions'); 
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Helper function to format Date, Start Time, and End Time perfectly
+        function formatDateTimeRange(start, end) {
+            const dateOpts = { month: 'numeric', day: 'numeric', year: 'numeric' };
+            const timeOpts = { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
             
-            const [player, setPlayer] = useState(null);
-            const [isPlaying, setIsPlaying] = useState(false);
-            const [currentTime, setCurrentTime] = useState(() => getSavedNum('borges_video_curr_time_hash'));
-            const [ccEnabled, setCcEnabled] = useState(false);
-            const [playbackRate, setPlaybackRate] = useState(1);
-            const [isFullscreen, setIsFullscreen] = useState(false);
+            const dateStr = start.toLocaleDateString(undefined, dateOpts);
+            const startTimeStr = start.toLocaleTimeString(undefined, timeOpts);
+            const endTimeStr = end.toLocaleTimeString(undefined, timeOpts);
             
-            const [maxTimeWatched, setMaxTimeWatched] = useState(() => getSavedNum('borges_video_max_time_hash'));
-            const maxTimeWatchedRef = useRef(getSavedNum('borges_video_max_time_hash'));
+            return `${dateStr} ${startTimeStr} - ${endTimeStr}`;
+        }
+
+        studentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const emailVal = emailInput.value.trim().toLowerCase();
+
+            if (submittedEmails.includes(emailVal)) {
+                emailError.classList.remove('hidden');
+                emailInput.focus();
+                return;
+            }
+            emailError.classList.add('hidden');
+
+            // Capture the moment they begin the test
+            testStartTime = new Date();
+
+            studentData = {
+                firstName: document.getElementById('fname').value.trim(),
+                lastName: document.getElementById('lname').value.trim(),
+                email: emailInput.value.trim(),
+                period: document.getElementById('period').value
+            };
+
+            quizQuestions = rawQuestions.map(item => {
+                const allOpts = shuffleArray([item.correct, ...item.distractors]);
+                return {
+                    q: item.q,
+                    correct: item.correct,
+                    options: allOpts
+                };
+            });
             
-            // Student Information States
-            const [firstName, setFirstName] = useState(() => getSavedStr('borges_video_first_name'));
-            const [lastName, setLastName] = useState(() => getSavedStr('borges_video_last_name'));
-            const [studentPeriod, setStudentPeriod] = useState(() => getSavedStr('borges_video_period'));
-            const [studentEmail, setStudentEmail] = useState(() => getSavedStr('borges_video_email'));
+            quizQuestions = shuffleArray(quizQuestions);
 
-            const firstNameRef = useRef(firstName);
-            const lastNameRef = useRef(lastName);
-            const studentPeriodRef = useRef(studentPeriod);
-            const studentEmailRef = useRef(studentEmail);
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            loadQuestion();
+        });
 
-            // Tab violation tracking
-            const [violations, setViolations] = useState(() => getSavedNum('borges_video_violations_hash'));
-            const violationsRef = useRef(violations);
-
-            const [showExitWarning, setShowExitWarning] = useState(false);
-            const [dismissedFinalOverlay, setDismissedFinalOverlay] = useState(false);
-            const playbackRateRef = useRef(1);
-            const lastSeekTimeRef = useRef(0);
-
-            // Question Tracking Logic
-            const [activeQuestion, setActiveQuestion] = useState(null);
-            const activeQuestionRef = useRef(null);
-            const lastTriggeredQuestionIdRef = useRef(null); 
-            const prevTimeRef = useRef(undefined); 
-
-            // Student Answers Object
-            const [studentAnswers, setStudentAnswers] = useState(getSavedAnswers());
-            const studentAnswersRef = useRef(studentAnswers);
-
-            // Modal Interactions
-            const [selectedOption, setSelectedOption] = useState(null);
-            const [showFeedback, setShowFeedback] = useState(false);
-            const [showResetConfirm, setShowResetConfirm] = useState(false);
-
-            const selectedOptionRef = useRef(null);
-            const showFeedbackRef = useRef(false);
-
-            // Teacher Mode States
-            const [isTeacherMode, setIsTeacherMode] = useState(false);
-            const isTeacherModeRef = useRef(false);
-            const [showPinModal, setShowPinModal] = useState(false);
-            const [pinInput, setPinInput] = useState("");
-            const [pinError, setPinError] = useState(false);
-
-            const playerContainerRef = useRef(null);
-            const intervalRef = useRef(null);
-            const videoWrapperRef = useRef(null);
-
-            // Fullscreen Event Listeners
-            useEffect(() => {
-                const handleFullscreenChange = () => {
-                    setIsFullscreen(!!document.fullscreenElement || !!document.webkitFullscreenElement);
-                };
+        function loadQuestion() {
+            window.speechSynthesis.cancel(); 
+            
+            const currentQ = quizQuestions[currentQuestionIndex];
+            questionTracker.textContent = `Question ${currentQuestionIndex + 1} / 50`;
+            questionText.textContent = currentQ.q;
+            
+            optionsContainer.innerHTML = '';
+            currentQ.options.forEach((opt, idx) => {
+                const label = document.createElement('label');
+                label.className = 'option-label';
                 
-                document.addEventListener('fullscreenchange', handleFullscreenChange);
-                document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-                return () => {
-                    document.removeEventListener('fullscreenchange', handleFullscreenChange);
-                    document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-                };
-            }, []);
-
-            // Keyboard navigation for Skip/Continue
-            useEffect(() => {
-                const handleKeyDown = (e) => {
-                    if (activeQuestionRef.current && e.key === 'Enter') {
-                        e.preventDefault(); 
-                        e.stopPropagation(); 
-                        if (showFeedbackRef.current) {
-                            handleContinueVideo();
-                        } else {
-                            handleSkip();
-                        }
-                    }
-                };
-                window.addEventListener('keydown', handleKeyDown, true);
-                return () => window.removeEventListener('keydown', handleKeyDown, true);
-            }, []);
-
-            // Browser 'Confirm Exit' Dialog
-            useEffect(() => {
-                const handleBeforeUnload = (e) => {
-                    if (view === 'video' && !isTeacherModeRef.current) {
-                        e.preventDefault();
-                        e.returnValue = ''; 
-                    }
-                };
-                window.addEventListener("beforeunload", handleBeforeUnload);
-                return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-            }, [view]);
-
-            // Tab Visibility Detection (Pauses video without penalizing, but adds violation)
-            useEffect(() => {
-                const handleVisibilityChange = () => {
-                    if (document.hidden && view === 'video' && !isTeacherModeRef.current) {
-                        if (player && typeof player.pauseVideo === 'function') {
-                            player.pauseVideo();
-                        }
-                        setViolations(prev => {
-                            const newCount = prev + 1;
-                            violationsRef.current = newCount;
-                            localStorage.setItem('borges_video_violations_hash', encodeBase64(SALT + newCount.toString()));
-                            return newCount;
-                        });
-                    }
-                };
-
-                document.addEventListener("visibilitychange", handleVisibilityChange);
-                return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-            }, [view, player, isFullscreen]);
-
-            // Load YouTube Iframe API
-            useEffect(() => {
-                if (view !== 'video') return;
-
-                if (!window.YT) {
-                    const tag = document.createElement('script');
-                    tag.src = "https://www.youtube.com/iframe_api";
-                    const firstScriptTag = document.getElementsByTagName('script')[0];
-                    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-                    
-                    window.onYouTubeIframeAPIReady = initializePlayer;
-                } else if (!player) {
-                    initializePlayer();
+                const leftDiv = document.createElement('div');
+                leftDiv.className = 'flex items-center flex-1';
+                
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'quiz-option';
+                input.value = opt;
+                
+                if (userAnswers[currentQuestionIndex] === opt) {
+                    input.checked = true;
                 }
-
-                return () => {
-                    if (intervalRef.current) clearInterval(intervalRef.current);
-                };
-            }, [view]);
-
-            const initializePlayer = () => {
-                const startTime = Math.floor(getSavedNum('borges_video_curr_time_hash'));
-                const newPlayer = new window.YT.Player(playerContainerRef.current, {
-                    videoId: VIDEO_ID,
-                    host: 'https://www.youtube-nocookie.com', 
-                    playerVars: {
-                        controls: 0,       
-                        disablekb: 1,      
-                        rel: 0,            
-                        modestbranding: 1, 
-                        fs: 0,             
-                        iv_load_policy: 3, 
-                        start: startTime,  
-                        cc_load_policy: 1,
-                        playsinline: 1,
-                        origin: window.location.origin 
-                    },
-                    events: {
-                        onReady: (event) => {
-                            setPlayer(event.target);
-                            event.target.setOption('captions', 'track', {}); 
-                            if (startTime > 0) {
-                                event.target.seekTo(startTime, true);
-                            }
-                        },
-                        onStateChange: (event) => {
-                            setIsPlaying(event.data === window.YT.PlayerState.PLAYING);
-                        }
-                    }
+                
+                input.addEventListener('change', () => {
+                    userAnswers[currentQuestionIndex] = opt;
                 });
-            };
 
-            // Main Video Loop
-            useEffect(() => {
-                if (isPlaying && player && view === 'video') {
-                    intervalRef.current = setInterval(() => {
-                        const time = player.getCurrentTime();
-                        
-                        if (time >= MAX_ALLOWED_TIME) {
-                            player.pauseVideo();
-                            if (document.fullscreenElement || document.webkitFullscreenElement) {
-                                if (document.exitFullscreen) document.exitFullscreen();
-                                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                            }
-                            handleFinalSubmit(); 
-                            return;
-                        }
+                const span = document.createElement('span');
+                span.className = 'option-text';
+                span.textContent = opt;
 
-                        // Enforce playback speed continuously
-                        if (!isTeacherModeRef.current && player.getPlaybackRate() !== playbackRateRef.current) {
-                            player.setPlaybackRate(playbackRateRef.current);
-                        }
-                        
-                        const prev = prevTimeRef.current !== undefined ? prevTimeRef.current : time;
+                leftDiv.appendChild(input);
+                leftDiv.appendChild(span);
+                label.appendChild(leftDiv);
 
-                        // Ironclad Anti-Fast-Forward System
-                        if (Date.now() - lastSeekTimeRef.current >= 1500) {
-                            let currentMax = maxTimeWatchedRef.current;
-                            const JUMP_TOLERANCE = 2.5; 
-
-                            if (!isTeacherModeRef.current && time > prev + JUMP_TOLERANCE) { 
-                                player.seekTo(prev, true);
-                                lastSeekTimeRef.current = Date.now();
-                                return; 
-                            } else {
-                                if (time > currentMax) {
-                                    maxTimeWatchedRef.current = time;
-                                    setMaxTimeWatched(time);
-                                    localStorage.setItem('borges_video_max_time_hash', encodeBase64(SALT + time.toString())); 
-                                }
-                            }
-                        }
-
-                        if (time > 0 || maxTimeWatchedRef.current === 0) {
-                            setCurrentTime(time);
-                            localStorage.setItem('borges_video_curr_time_hash', encodeBase64(SALT + time.toString())); 
-                        }
-
-                        // === Guaranteed Question Triggering (Once per question) ===
-                        if (!activeQuestionRef.current) {
-                            const upcoming = QUIZ_QUESTIONS.find(q => {
-                                // IMPORTANT: If already answered/skipped, DO NOT trigger it again. 
-                                if (studentAnswersRef.current[q.id] !== undefined) return false;
-
-                                const inWindow = time >= q.timestamp && time < q.timestamp + 2;
-                                const passedByLag = prev <= q.timestamp && time > q.timestamp && (time - prev) < 5;
-                                return inWindow || passedByLag;
-                            });
-                            
-                            if (upcoming && lastTriggeredQuestionIdRef.current !== upcoming.id) {
-                                player.pauseVideo();
-                                setActiveQuestion(upcoming);
-                                activeQuestionRef.current = upcoming;
-                                lastTriggeredQuestionIdRef.current = upcoming.id;
-                            } else if (!upcoming) {
-                                lastTriggeredQuestionIdRef.current = null; 
-                            }
-                        }
-
-                        prevTimeRef.current = time;
-                    }, 250);
-                } else {
-                    if (intervalRef.current) clearInterval(intervalRef.current);
-                }
-
-                return () => {
-                    if (intervalRef.current) clearInterval(intervalRef.current);
-                };
-            }, [isPlaying, player, view]);
-
-            const togglePlayPause = () => {
-                if (!player) return;
-                if (isPlaying) {
-                    player.pauseVideo();
-                } else {
-                    player.playVideo();
-                }
-            };
-
-            const toggleCC = () => {
-                if (!player) return;
-                if (ccEnabled) {
-                    player.setOption('captions', 'track', {}); 
-                    setCcEnabled(false);
-                } else {
-                    player.setOption('captions', 'track', {languageCode: 'en'}); 
-                    setCcEnabled(true);
-                }
-            };
-
-            const toggleSpeed = () => {
-                if (!player) return;
-                const newRate = playbackRate === 1 ? 1.25 : 1;
-                setPlaybackRate(newRate);
-                playbackRateRef.current = newRate;
-                player.setPlaybackRate(newRate);
-            };
-
-            const handleRewind = () => {
-                if (!player) return;
-                const newTime = Math.max(0, player.getCurrentTime() - 10);
+                const optReadBtn = document.createElement('button');
+                optReadBtn.type = 'button';
+                optReadBtn.title = 'Read this option aloud';
+                optReadBtn.className = 'ml-4 p-2 text-sky-400 hover:text-sky-700 hover:bg-sky-100 rounded-full transition focus:outline-none flex-shrink-0';
+                optReadBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 0 0 1.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06ZM18.584 5.106a.75.75 0 0 1 1.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 0 1-1.06-1.06 8.25 8.25 0 0 0 0-11.668.75.75 0 0 1 0-1.06Z" /><path d="M15.932 7.757a.75.75 0 0 1 1.061 0 6 6 0 0 1 0 8.486.75.75 0 0 1-1.06-1.061 4.5 4.5 0 0 0 0-6.364.75.75 0 0 1 0-1.06Z" /></svg>`;
                 
-                if (!isTeacherModeRef.current) {
-                    maxTimeWatchedRef.current = newTime;
-                    setMaxTimeWatched(newTime);
-                    localStorage.setItem('borges_video_max_time_hash', encodeBase64(SALT + newTime.toString()));
-                }
-
-                lastSeekTimeRef.current = Date.now(); 
-                player.seekTo(newTime, true);
-                setCurrentTime(newTime);
-                prevTimeRef.current = newTime;
-                lastTriggeredQuestionIdRef.current = null; 
-            };
-
-            const toggleFullscreen = () => {
-                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                    if (videoWrapperRef.current.requestFullscreen) {
-                        videoWrapperRef.current.requestFullscreen();
-                    } else if (videoWrapperRef.current.webkitRequestFullscreen) {
-                        videoWrapperRef.current.webkitRequestFullscreen();
-                    }
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) {
-                        document.webkitExitFullscreen();
-                    }
-                }
-            };
-
-            const handleTimelineClick = (e) => {
-                if (!player) return;
-                const rect = e.currentTarget.getBoundingClientRect();
-                const clickRatio = (e.clientX - rect.left) / rect.width;
-                let targetTime = clickRatio * MAX_ALLOWED_TIME;
-                const currentVidTime = player.getCurrentTime();
-
-                if (!isTeacherModeRef.current) {
-                    if (targetTime > currentVidTime) {
-                        targetTime = currentVidTime; 
-                    }
-                    maxTimeWatchedRef.current = targetTime;
-                    setMaxTimeWatched(targetTime);
-                    localStorage.setItem('borges_video_max_time_hash', encodeBase64(SALT + targetTime.toString()));
-                } else {
-                    if (targetTime > maxTimeWatchedRef.current) {
-                        maxTimeWatchedRef.current = targetTime;
-                        setMaxTimeWatched(targetTime);
-                        localStorage.setItem('borges_video_max_time_hash', encodeBase64(SALT + targetTime.toString()));
-                    }
-                }
-                 
-                lastSeekTimeRef.current = Date.now(); 
-                player.seekTo(targetTime, true);
-                setCurrentTime(targetTime);
-                prevTimeRef.current = targetTime;
-                lastTriggeredQuestionIdRef.current = null;
-            };
-
-            const handleTimelineSlider = (e) => {
-                if (!player) return;
-                let targetTime = parseFloat(e.target.value);
-                const currentVidTime = player.getCurrentTime();
-
-                if (!isTeacherModeRef.current) {
-                    if (targetTime > currentVidTime) {
-                        targetTime = currentVidTime; 
-                    }
-                    maxTimeWatchedRef.current = targetTime;
-                    setMaxTimeWatched(targetTime);
-                    localStorage.setItem('borges_video_max_time_hash', encodeBase64(SALT + targetTime.toString()));
-                } else {
-                    if (targetTime > maxTimeWatchedRef.current) {
-                        maxTimeWatchedRef.current = targetTime;
-                        setMaxTimeWatched(targetTime);
-                        localStorage.setItem('borges_video_max_time_hash', encodeBase64(SALT + targetTime.toString()));
-                    }
-                }
-                 
-                lastSeekTimeRef.current = Date.now(); 
-                player.seekTo(targetTime, true);
-                setCurrentTime(targetTime);
-                prevTimeRef.current = targetTime;
-                lastTriggeredQuestionIdRef.current = null;
-            };
-
-            const handleOptionClick = (index) => {
-                if (showFeedbackRef.current) return; 
-                setSelectedOption(index);
-                selectedOptionRef.current = index;
-                setShowFeedback(true);
-                showFeedbackRef.current = true;
-            };
-
-            const handleSkip = () => {
-                const questionId = activeQuestionRef.current?.id;
-                if (!questionId) return;
-
-                setStudentAnswers(prev => {
-                    const next = { ...prev, [questionId]: false };
-                    studentAnswersRef.current = next;
-                    try {
-                        localStorage.setItem('borges_video_answers_hash', encodeBase64(SALT + JSON.stringify(next)));
-                    } catch(err) {}
-                    return next;
+                optReadBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevents the radio button from being selected when clicking the speaker
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(opt);
+                    utterance.lang = 'es-ES'; // Set language to Spanish for authentic pronunciation
+                    window.speechSynthesis.speak(utterance);
                 });
-                
-                resetModalState();
-            };
 
-            const handleContinueVideo = () => {
-                const currentQ = activeQuestionRef.current;
-                if (!currentQ) return;
+                label.appendChild(optReadBtn);
+                optionsContainer.appendChild(label);
+            });
 
-                const questionId = currentQ.id;
-                const correctIndex = currentQ.correctIndex;
-                const selectedOpt = selectedOptionRef.current;
+            btnBack.style.display = currentQuestionIndex === 0 ? 'none' : 'block';
+            btnNext.textContent = currentQuestionIndex === quizQuestions.length - 1 ? 'Submit Test' : 'Next';
+        }
 
-                setStudentAnswers(prev => {
-                    const isCorrect = selectedOpt === correctIndex;
-                    const next = { ...prev, [questionId]: isCorrect };
-                    studentAnswersRef.current = next;
-                    try {
-                        localStorage.setItem('borges_video_answers_hash', encodeBase64(SALT + JSON.stringify(next)));
-                    } catch(err) {}
-                    return next;
-                });
-                
-                resetModalState();
-            };
+        btnReadAloud.addEventListener('click', () => {
+            const currentQ = quizQuestions[currentQuestionIndex];
+            if (currentQ && currentQ.q) {
+                // Cancel any previous speech before starting a new one
+                window.speechSynthesis.cancel(); 
+                const utterance = new SpeechSynthesisUtterance(currentQ.q);
+                // Set language to en-US since most of the question instructions are in English
+                utterance.lang = 'en-US'; 
+                window.speechSynthesis.speak(utterance);
+            }
+        });
 
-            const resetModalState = () => {
-                setActiveQuestion(null);
-                activeQuestionRef.current = null;
-                setSelectedOption(null);
-                selectedOptionRef.current = null;
-                setShowFeedback(false);
-                showFeedbackRef.current = false;
-                
-                if (player && typeof player.playVideo === 'function') {
-                    player.playVideo();
-                }
-            };
+        btnBack.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        });
 
-            // Reset Everything Function
-            const executeFullReset = () => {
-                localStorage.removeItem('borges_video_curr_time_hash');
-                localStorage.removeItem('borges_video_max_time_hash');
-                localStorage.removeItem('borges_video_answers_hash');
-                localStorage.removeItem('borges_video_violations_hash');
-                
-                setCurrentTime(0);
-                setMaxTimeWatched(0);
-                maxTimeWatchedRef.current = 0;
-                setStudentAnswers({});
-                studentAnswersRef.current = {};
-                setViolations(0);
-                violationsRef.current = 0;
-                setDismissedFinalOverlay(false);
-                
-                setShowResetConfirm(false);
-                
-                if (player && typeof player.seekTo === 'function') {
-                    player.seekTo(0, true);
-                    player.playVideo();
-                }
-                lastSeekTimeRef.current = Date.now();
-                prevTimeRef.current = 0;
-                lastTriggeredQuestionIdRef.current = null;
-            };
+        btnNext.addEventListener('click', () => {
+            if (currentQuestionIndex < quizQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        });
 
-            // Input Handlers
-            const handleFirstNameChange = (e) => {
-                setFirstName(e.target.value);
-                firstNameRef.current = e.target.value;
-                localStorage.setItem('borges_video_first_name', encodeBase64(SALT + e.target.value));
-            };
-            const handleLastNameChange = (e) => {
-                setLastName(e.target.value);
-                lastNameRef.current = e.target.value;
-                localStorage.setItem('borges_video_last_name', encodeBase64(SALT + e.target.value));
-            };
-            const handlePeriodChange = (e) => {
-                setStudentPeriod(e.target.value);
-                studentPeriodRef.current = e.target.value;
-                localStorage.setItem('borges_video_period', encodeBase64(SALT + e.target.value));
-            };
-            const handleEmailChange = (e) => {
-                setStudentEmail(e.target.value);
-                studentEmailRef.current = e.target.value;
-                localStorage.setItem('borges_video_email', encodeBase64(SALT + e.target.value));
-            };
-
-            const isFormValid = Boolean(firstName?.trim() && lastName?.trim() && studentPeriod && studentEmail?.trim());
-
-            const calculateScore = () => {
-                return Object.values(studentAnswersRef.current).filter(val => val === true).length;
-            };
-
-            const formatTime = (seconds) => {
-                const h = Math.floor(seconds / 3600);
-                const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-                const s = Math.floor(seconds % 60).toString().padStart(2, '0');
-                return h > 0 ? `${h}:${m}:${s}` : `${m}:${s}`;
-            };
-
-            const maxWatchedStyle = { width: `${(maxTimeWatched / MAX_ALLOWED_TIME) * 100 || 0}%` };
-            const currentTimeStyle = { width: `${(currentTime / MAX_ALLOWED_TIME) * 100 || 0}%` };
-
-            const downloadJPG = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 1000;
-                canvas.height = 700;
-                const ctx = canvas.getContext('2d');
-
-                // Advanced Anti-Counterfeit Background
-                const gradient = ctx.createLinearGradient(0, 0, 1000, 700);
-                gradient.addColorStop(0, '#0f172a'); // Deep Slate
-                gradient.addColorStop(0.5, '#3b0764'); // Deep Purple
-                gradient.addColorStop(1, '#172554'); // Deep Blue
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, 1000, 700);
-
-                // Cryptographic Background Watermark Pattern
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-                ctx.font = '22px monospace';
-                for (let i = 0; i < 40; i++) {
-                    ctx.fillText('VERIFIED SECURE STUDENT SCORE RECORD  VERIFIED SECURE STUDENT SCORE RECORD', -50 + (i % 2) * 40, i * 30);
-                }
-
-                // Geometric Anti-Forgery Shapes
-                for (let i = 0; i < 20; i++) {
-                    ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.05})`;
-                    ctx.beginPath();
-                    ctx.arc(Math.random() * 1000, Math.random() * 700, Math.random() * 150, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                // Center Certificate Container
-                ctx.fillStyle = 'rgba(30, 41, 59, 0.9)';
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-                ctx.shadowBlur = 30;
-                ctx.fillRect(80, 80, 840, 540);
-                ctx.shadowBlur = 0;
-
-                ctx.strokeStyle = 'rgba(99, 102, 241, 0.5)';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(80, 80, 840, 540);
-
-                // Text Settings
-                ctx.textAlign = 'center';
-                
-                ctx.fillStyle = '#f8fafc';
-                ctx.font = 'bold 36px Arial';
-                ctx.fillText('Jorge Luis Borges - The Mirror Man', 500, 150);
-
-                ctx.fillStyle = '#818cf8';
-                ctx.font = '22px Arial';
-                ctx.fillText('OFFICIAL COMPLETION CERTIFICATE', 500, 190);
-
-                // Student Identity
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 48px Arial';
-                ctx.fillText(`${firstNameRef.current} ${lastNameRef.current}`, 500, 280);
-
-                ctx.fillStyle = '#cbd5e1';
-                ctx.font = '24px Arial';
-                ctx.fillText(`Period: ${studentPeriodRef.current} | Email: ${studentEmailRef.current}`, 500, 325);
-
-                // Final Score
-                const finalScore = calculateScore();
-                ctx.font = 'bold 80px Arial';
-                ctx.fillStyle = finalScore >= 14 ? '#4ade80' : (finalScore >= 10 ? '#fbbf24' : '#ef4444');
-                ctx.fillText(`Score: ${finalScore} / 20`, 500, 430);
-
-                // Timestamp
-                ctx.fillStyle = '#94a3b8';
-                ctx.font = '22px Arial';
-                const now = new Date();
-                ctx.fillText(`Date: ${now.toLocaleDateString()}  |  Time: ${now.toLocaleTimeString()}`, 500, 490);
-
-                // Cheating Alerts
-                const currentViolations = violationsRef.current;
-                ctx.fillStyle = currentViolations > 0 ? '#f87171' : '#4ade80';
-                ctx.font = 'bold 20px Arial';
-                ctx.fillText(`Cheating Alerts (Tab Violations): ${currentViolations}`, 500, 530);
-
-                // Security Hash ID (to prevent photoshop forgery of names)
-                ctx.fillStyle = '#475569';
-                ctx.font = '16px monospace';
-                const hashStr = btoa(`${firstNameRef.current}_${lastNameRef.current}_${finalScore}_${now.getTime()}`).substring(0, 35);
-                ctx.fillText(`AUTH-ID: ${hashStr}-${currentViolations}`, 500, 580);
-
-                // Download the Image
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-                const link = document.createElement('a');
-                const safeName = `${firstNameRef.current}_${lastNameRef.current}`.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'student';
-                link.download = `${safeName}_borges_score.jpg`;
-                link.href = dataUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            };
-
-            const handleFinalSubmit = () => {
-                downloadJPG();
-                if (document.fullscreenElement || document.webkitFullscreenElement) {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) {
-                        document.webkitExitFullscreen();
-                    }
-                }
-                setView('finished');
-            };
-
-            const handlePinSubmit = (e) => {
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !quizScreen.classList.contains('hidden') && cheatModal.classList.contains('hidden')) {
                 e.preventDefault();
-                if (pinInput === TEACHER_PIN) {
-                    setIsTeacherMode(true);
-                    isTeacherModeRef.current = true;
-                    setShowPinModal(false);
-                    setPinInput("");
-                    setPinError(false);
+                btnNext.click();
+            }
+        });
+
+        function triggerCheat() {
+            if (!quizScreen.classList.contains('hidden') && endScreen.classList.contains('hidden')) {
+                cheatCount++;
+                cheatNumber.textContent = cheatCount;
+                cheatModal.classList.remove('hidden');
+            }
+        }
+
+        window.addEventListener('blur', triggerCheat);
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) triggerCheat();
+        });
+        document.addEventListener('mouseleave', () => {
+            triggerCheat();
+        });
+        window.addEventListener('mouseout', (e) => {
+            if (!e.relatedTarget && !e.toElement) {
+                triggerCheat();
+            }
+        });
+
+        btnCheatOk.addEventListener('click', () => {
+            cheatModal.classList.add('hidden');
+        });
+
+        function finishQuiz() {
+            window.speechSynthesis.cancel();
+            
+            let scoreCount = 0;
+            let resultsSummaryArr = [];
+            
+            // Capture the exact moment the test is finished
+            let testEndTime = new Date();
+            let timeRangeString = formatDateTimeRange(testStartTime, testEndTime);
+
+            quizQuestions.forEach((item, idx) => {
+                const uAns = userAnswers[idx];
+                const isCorrect = uAns === item.correct;
+                if (isCorrect) {
+                    scoreCount++;
+                    resultsSummaryArr.push(`question ${idx + 1}: right answer: '${item.correct}'`);
                 } else {
-                    setPinError(true);
-                    setPinInput("");
+                    const wrongAns = uAns !== undefined ? uAns : 'No answer provided';
+                    resultsSummaryArr.push(`question ${idx + 1}: wrong answer: '${wrongAns}'; right answer: '${item.correct}'`);
                 }
+            });
+
+            const percentage = Math.round((scoreCount / quizQuestions.length) * 100);
+            finalScoreDisplay.textContent = `${percentage}% (${scoreCount} / ${quizQuestions.length})`;
+
+            submittedEmails.push(studentData.email.toLowerCase());
+            localStorage.setItem('submitted_reg_verbs_emails', JSON.stringify(submittedEmails));
+
+            // EXACT WEB APP URL
+            const GOOGLE_SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxCS4RTjryw4mNi7frycJVuY0dXO9iEHqKMkTjRLQwiRKmhf5Yoa_pFUsCQwXvxP6g/exec";
+
+            const payloadData = {
+                title: "Regular Spanish Verbs Test (50 Qs)",
+                date: timeRangeString, // Sends the single formatted string with date and both times
+                firstName: studentData.firstName,
+                lastName: studentData.lastName,
+                email: studentData.email,
+                period: studentData.period,
+                score: `${percentage}% (${scoreCount}/${quizQuestions.length})`,
+                cheatCount: cheatCount,
+                results: resultsSummaryArr.join(' | ') 
             };
 
-            const disableTeacherMode = () => {
-                setIsTeacherMode(false);
-                isTeacherModeRef.current = false;
-            };
+            if (GOOGLE_SHEET_WEB_APP_URL) {
+                const formBody = [];
+                for (const property in payloadData) {
+                    const encodedKey = encodeURIComponent(property);
+                    const encodedValue = encodeURIComponent(payloadData[property]);
+                    formBody.push(encodedKey + "=" + encodedValue);
+                }
+                const formattedBody = formBody.join("&");
 
-            if (view === 'instructions') {
-                return (
-                    <div className="max-w-2xl w-full bg-slate-800 p-5 sm:p-8 rounded-2xl shadow-2xl border border-slate-700 relative my-auto">
-                        {!isTeacherMode ? (
-                            <button 
-                                onClick={() => setShowPinModal(true)}
-                                className="absolute top-4 right-4 text-slate-700 hover:text-slate-400 transition-colors"
-                                title="Teacher Access"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                            </button>
-                        ) : (
-                            <button 
-                                onClick={disableTeacherMode}
-                                className="absolute top-4 right-4 text-green-500 hover:text-green-400 transition-colors text-sm font-bold flex items-center gap-1 bg-green-900/20 px-3 py-1 rounded-full border border-green-500/30"
-                                title="Return to Student Mode"
-                            >
-                                🔓 Exit Teacher Mode
-                            </button>
-                        )}
-
-                        <h1 className="text-2xl sm:text-3xl font-black text-white mb-4 border-b border-slate-700 pb-3 sm:pb-4 uppercase tracking-wider text-center">
-                            Jorge Luis Borges<br/>
-                            <span className="text-lg sm:text-xl text-blue-400 block mt-1">The Mirror Man</span>
-                        </h1>
-                        
-                        <div className="space-y-3 sm:space-y-4 text-sm sm:text-base leading-relaxed text-slate-200 font-medium">
-                            <p>
-                                Watch until the end.
-                            </p>
-                            <p className="text-red-400 font-bold bg-red-900/20 p-3 sm:p-4 rounded-xl border border-red-500/30 text-sm sm:text-base">
-                                At the end of the video, your final score window will appear, and you will download a JPG certificate. You must submit this downloaded file to your teacher!
-                            </p>
-                        </div>
-                        
-                        <div className="bg-slate-700/40 p-4 sm:p-5 rounded-xl border border-slate-600 mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                            <div>
-                                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1">First Name: <span className="text-red-400">*</span></label>
-                                <input 
-                                    type="text" 
-                                    value={firstName}
-                                    onChange={handleFirstNameChange}
-                                    placeholder="First Name"
-                                    className="w-full bg-slate-900 text-white px-3 py-2 rounded-lg border border-slate-500 focus:outline-none focus:border-blue-500 text-sm sm:text-base"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1">Last Name: <span className="text-red-400">*</span></label>
-                                <input 
-                                    type="text" 
-                                    value={lastName}
-                                    onChange={handleLastNameChange}
-                                    placeholder="Last Name"
-                                    className="w-full bg-slate-900 text-white px-3 py-2 rounded-lg border border-slate-500 focus:outline-none focus:border-blue-500 text-sm sm:text-base"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1">Period: <span className="text-red-400">*</span></label>
-                                <select 
-                                    value={studentPeriod}
-                                    onChange={handlePeriodChange}
-                                    className="w-full bg-slate-900 text-white px-3 py-2 rounded-lg border border-slate-500 focus:outline-none focus:border-blue-500 text-sm sm:text-base"
-                                >
-                                    <option value="" disabled>Select Period...</option>
-                                    <option value="1">1</option>
-                                    <option value="a2">a2</option>
-                                    <option value="a4">a4</option>
-                                    <option value="b2">b2</option>
-                                    <option value="b3">b3</option>
-                                    <option value="b4">b4</option>
-                                    <option value="5th">5th</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1">Email: <span className="text-red-400">*</span></label>
-                                <input 
-                                    type="email" 
-                                    value={studentEmail}
-                                    onChange={handleEmailChange}
-                                    placeholder="student@email.com"
-                                    className="w-full bg-slate-900 text-white px-3 py-2 rounded-lg border border-slate-500 focus:outline-none focus:border-blue-500 text-sm sm:text-base"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="mt-6 sm:mt-8 flex justify-center pb-1">
-                            <button 
-                                onClick={() => setView('video')}
-                                disabled={!isFormValid}
-                                className={`px-8 py-3 sm:px-10 sm:py-4 rounded-xl font-black text-lg sm:text-xl uppercase tracking-wide transition-all transform ${isFormValid ? 'bg-green-600 hover:bg-green-500 text-white shadow-[0_0_20px_rgba(22,163,74,0.4)] hover:scale-105' : 'bg-slate-600 text-slate-400 cursor-not-allowed'}`}
-                            >
-                                Go to the Video
-                            </button>
-                        </div>
-
-                        {showPinModal && (
-                            <div className="absolute inset-0 bg-slate-900/95 backdrop-blur-sm z-50 flex items-center justify-center rounded-2xl">
-                                <div className="bg-slate-800 p-8 rounded-xl border border-slate-600 shadow-2xl w-96 max-w-full relative">
-                                    <button 
-                                        onClick={() => { setShowPinModal(false); setPinError(false); }}
-                                        className="absolute top-3 right-3 text-slate-400 hover:text-white"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                                    </button>
-                                    <h2 className="text-2xl font-bold text-white mb-4 text-center">Teacher Override</h2>
-                                    <form onSubmit={handlePinSubmit} className="flex flex-col gap-4">
-                                        <input 
-                                            type="password" 
-                                            value={pinInput}
-                                            onChange={(e) => setPinInput(e.target.value)}
-                                            placeholder="Enter PIN" 
-                                            className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border focus:outline-none text-center text-xl tracking-widest font-mono"
-                                            autoFocus
-                                        />
-                                        {pinError && <p className="text-red-400 text-sm text-center font-bold">Incorrect PIN.</p>}
-                                        <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-colors">
-                                            Unlock Timeline
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                );
+                fetch(GOOGLE_SHEET_WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formattedBody
+                }).then(() => {
+                    console.log('Payload transmitted via form urlencoding');
+                }).catch(err => {
+                    console.error('Transmission error:', err);
+                });
             }
 
-            if (view === 'finished') {
-                return (
-                    <div className="max-w-3xl w-full bg-slate-800 p-10 rounded-2xl shadow-2xl border border-slate-700 text-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto text-green-400 mb-6"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
-                        <h1 className="text-4xl font-black text-white mb-2">Video Completed</h1>
-                        <h2 className="text-xl text-blue-400 font-bold mb-6">{firstName} {lastName}</h2>
-                        
-                        <div className="bg-slate-900 border border-slate-600 rounded-xl p-8 mb-8 inline-block shadow-inner">
-                            <p className="text-slate-400 text-lg uppercase tracking-widest font-bold mb-2">Final Score</p>
-                            <p className="text-6xl font-black text-white">
-                                <span className={calculateScore() >= 14 ? 'text-green-400' : 'text-amber-400'}>
-                                    {calculateScore()}
-                                </span> 
-                                <span className="text-3xl text-slate-500"> / 20</span>
-                            </p>
-                        </div>
-                        
-                        <div className="bg-slate-700/50 rounded-xl p-6 mb-8 border border-slate-600">
-                            <h3 className="text-xl font-bold text-blue-400 mb-2">📥 Certificate Downloaded</h3>
-                            <p className="text-slate-300 mb-4">Your colorful JPG certificate has been generated and downloaded. If your browser blocked it, please click the button below to download it manually.</p>
-                            <button 
-                                onClick={downloadJPG}
-                                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-bold transition-colors shadow-lg"
-                            >
-                                Download Certificate Again
-                            </button>
-                        </div>
+            downloadCSV(payloadData);
 
-                        <p className="mt-8 text-xl text-amber-400 font-bold">
-                            Please ensure your image file has downloaded and submit it to your teacher!
-                        </p>
-                    </div>
-                );
-            }
+            quizScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+        }
 
-            return (
-                <div className="w-full flex flex-col items-center gap-6 animate-fadeIn">
-                    {!isFullscreen && (
-                        <div className="text-center space-y-2 w-full max-w-5xl">
-                            <h1 className="text-3xl font-bold text-white">Jorge Luis Borges - The Mirror Man</h1>
-                            {isTeacherMode && (
-                                <div className="flex flex-col items-center gap-3">
-                                    <p className="text-green-400 font-bold bg-green-900/30 px-4 py-1 rounded-full inline-block border border-green-500/50">
-                                        🔓 TEACHER MODE ACTIVE
-                                    </p>
-                                    <button 
-                                        onClick={disableTeacherMode}
-                                        className="text-sm font-black text-white hover:bg-red-500 transition-colors bg-red-600 px-6 py-2 rounded-full border border-red-400 shadow-[0_0_15px_rgba(220,38,38,0.6)] uppercase tracking-wide"
-                                    >
-                                        ❌ Return to Student Mode
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    )}
+        function downloadCSV(data) {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "Quiz Title,Date & Duration,First Name,Last Name,Email,Period,Score,Cheating Alerts\n" +
+                `"${data.title}","${data.date}","${data.firstName}","${data.lastName}","${data.email}","${data.period}","${data.score}",${data.cheatCount}`;
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Regular_Verbs_Record_${data.lastName}_${data.firstName}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
 
-                    {/* Wrapper targeted for Fullscreen */}
-                    <div 
-                        ref={videoWrapperRef} 
-                        className={`flex flex-col relative transition-all duration-300 ${isFullscreen ? 'w-screen h-screen bg-black justify-center' : 'w-full rounded-xl shadow-2xl overflow-hidden border border-slate-700'}`}
-                    >
-                        <div className={`relative w-full bg-black ${isFullscreen ? 'flex-grow' : 'aspect-video'}`}>
-                            <div ref={playerContainerRef} className="absolute inset-0 w-full h-full"></div>
-                            
-                            {/* Physical Shield: Completely blocks mouse clicks/taps directly on the YouTube iframe */}
-                            <div className="absolute inset-0 z-10 bg-transparent"></div>
-
-                            {/* Giant Final Submit Overlay (Appears after Q20 is answered) */}
-                            {studentAnswers[20] !== undefined && !activeQuestion && view === 'video' && !dismissedFinalOverlay && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center z-[60] bg-slate-900/90 backdrop-blur-sm pointer-events-auto">
-                                    <div className="bg-slate-800 p-8 sm:p-12 rounded-3xl shadow-[0_0_60px_rgba(22,163,74,0.3)] border-2 border-slate-600 text-center max-w-2xl mx-4 flex flex-col gap-6 w-full">
-                                        <span className="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider block">Last question answered!</span>
-                                        <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleFinalSubmit();
-                                            }}
-                                            className="bg-green-600 text-white hover:bg-green-500 transition-transform hover:scale-105 shadow-[0_0_20px_rgba(22,163,74,0.6)] text-2xl sm:text-3xl font-bold py-4 px-8 rounded-xl w-full border border-green-400"
-                                        >
-                                            Save Score & Submit
-                                        </button>
-                                        <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setDismissedFinalOverlay(true);
-                                            }}
-                                            className="text-slate-400 hover:text-white underline font-medium text-lg mt-2 transition-colors"
-                                        >
-                                            Disregard and continue watching
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Interactive Question Modal Overlay */}
-                        {activeQuestion && (
-                            <div className="absolute inset-0 bg-slate-900/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-4 sm:p-8 overflow-y-auto">
-                                <div 
-                                    className="max-w-3xl w-full bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl border border-slate-600 my-auto select-none"
-                                    onCopy={(e) => e.preventDefault()}
-                                    onContextMenu={(e) => e.preventDefault()}
-                                >
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h2 className="text-xl sm:text-2xl font-bold text-white leading-relaxed">
-                                            {activeQuestion.text}
-                                        </h2>
-                                        <span className="bg-blue-600 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap ml-4">
-                                            Question {activeQuestion.id} of 20
-                                        </span>
-                                    </div>
-                                    
-                                    <div className="space-y-3">
-                                        {activeQuestion.options.map((option, idx) => {
-                                            let btnStyles = "w-full text-left p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 font-medium ";
-                                            
-                                            if (!showFeedback) {
-                                                btnStyles += "border-slate-600 hover:border-blue-400 hover:bg-slate-700 bg-slate-700/50 text-slate-200";
-                                            } else {
-                                                if (idx === activeQuestion.correctIndex) {
-                                                    btnStyles += "border-green-500 bg-green-500/20 text-green-100"; 
-                                                } else if (idx === selectedOption) {
-                                                    btnStyles += "border-red-500 bg-red-500/20 text-red-100"; 
-                                                } else {
-                                                    btnStyles += "border-slate-700 bg-slate-800 text-slate-500 opacity-50"; 
-                                                }
-                                            }
-
-                                            return (
-                                                <button 
-                                                    key={idx} 
-                                                    onClick={() => handleOptionClick(idx)}
-                                                    className={btnStyles}
-                                                    disabled={showFeedback}
-                                                >
-                                                    <span className="inline-block w-8 font-bold opacity-70">
-                                                        {String.fromCharCode(65 + idx)}.
-                                                    </span>
-                                                    {option}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-
-                                    <div className="mt-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 animate-fadeIn border-t border-slate-700 pt-6">
-                                        {!showFeedback ? (
-                                            <>
-                                                <div className="text-slate-400 font-medium text-sm hidden sm:block">Press <kbd className="bg-slate-700 px-2 py-1 rounded border border-slate-600 text-white">Enter</kbd> to skip</div>
-                                                <button 
-                                                    onClick={handleSkip}
-                                                    className="w-full sm:w-auto text-slate-300 hover:text-white px-6 py-3 rounded-lg font-bold transition-colors border border-slate-600 hover:bg-slate-700"
-                                                >
-                                                    Skip Question
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <div className={`text-xl font-bold ${selectedOption === activeQuestion.correctIndex ? 'text-green-400' : 'text-red-400'}`}>
-                                                    {selectedOption === activeQuestion.correctIndex ? '✓ Correct!' : '✗ Incorrect.'}
-                                                </div>
-                                                <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                                                    <span className="text-slate-400 font-medium text-sm hidden sm:block">Press <kbd className="bg-slate-700 px-2 py-1 rounded border border-slate-600 text-white">Enter</kbd> to continue</span>
-                                                    <button 
-                                                        onClick={handleContinueVideo}
-                                                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-10 py-3 rounded-lg font-bold shadow-lg transition-colors text-lg"
-                                                    >
-                                                        Continue Video
-                                                    </button>
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Custom Control Bar */}
-                        <div className={`w-full bg-slate-800 p-4 sm:p-5 flex flex-col gap-3 z-40 ${isFullscreen ? 'pb-8' : ''}`}>
-                            {/* Timeline strictly mapped to the assigned duration */}
-                            <div 
-                                className="relative w-full h-4 bg-slate-700 rounded-full group flex items-center cursor-pointer"
-                                onClick={handleTimelineClick}
-                            >
-                                {/* Max Watched Buffer */}
-                                <div 
-                                    className="absolute top-0 left-0 h-full bg-slate-500 rounded-full opacity-50 transition-all duration-200 pointer-events-none"
-                                    style={maxWatchedStyle}
-                                ></div>
-                                
-                                {/* Current Time Progress */}
-                                <div 
-                                    className="absolute top-0 left-0 h-full bg-blue-500 rounded-full transition-all duration-200 pointer-events-none"
-                                    style={currentTimeStyle}
-                                ></div>
-
-                                {/* Question Markers on Timeline */}
-                                {MAX_ALLOWED_TIME > 0 && QUIZ_QUESTIONS.map(q => {
-                                    const markerStyle = { left: `calc(${(q.timestamp / MAX_ALLOWED_TIME) * 100}% - 2px)` };
-                                    
-                                    // Color logic based on answered state
-                                    let dotColor = 'bg-amber-400';
-                                    if (studentAnswers[q.id] === true) dotColor = 'bg-green-400 opacity-80';
-                                    if (studentAnswers[q.id] === false) dotColor = 'bg-red-500 opacity-80';
-
-                                    return (
-                                        <div 
-                                            key={q.id}
-                                            className={`absolute top-1/2 -translate-y-1/2 w-1.5 h-4 rounded-full pointer-events-none ${dotColor}`}
-                                            style={markerStyle}
-                                        ></div>
-                                    );
-                                })}
-
-                                {/* Invisible Native Range Slider for Flawless Scrubbing */}
-                                <input 
-                                    type="range" 
-                                    min="0" 
-                                    max={MAX_ALLOWED_TIME} 
-                                    value={currentTime}
-                                    step="0.1"
-                                    onChange={handleTimelineSlider}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30"
-                                    title="Seek"
-                                />
-                            </div>
-
-                            {/* Controls row */}
-                            <div className="flex items-center gap-3 sm:gap-5 mt-2">
-                                <button 
-                                    onClick={togglePlayPause}
-                                    className="text-white hover:text-blue-400 transition-colors focus:outline-none z-20"
-                                    disabled={!!activeQuestion}
-                                    title={isPlaying ? "Pause" : "Play"}
-                                >
-                                    {isPlaying ? (
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-                                    ) : (
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-                                    )}
-                                </button>
-                                
-                                <button 
-                                    onClick={handleRewind}
-                                    className="text-white hover:text-blue-400 transition-colors focus:outline-none flex items-center gap-1 z-20"
-                                    disabled={!!activeQuestion}
-                                    title="Rewind 10 Seconds"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                                    <span className="text-sm font-bold -ml-0.5 hidden sm:inline">10s</span>
-                                </button>
-                                
-                                <button 
-                                    onClick={toggleCC}
-                                    className={`transition-colors focus:outline-none z-20 ${ccEnabled ? 'text-blue-400' : 'text-slate-400 hover:text-white'}`}
-                                    title={ccEnabled ? "Turn Off Captions" : "Turn On Captions"}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>
-                                </button>
-
-                                {/* Playback Speed Button & Teacher Override */}
-                                <div className="ml-2 flex items-center gap-3 hidden md:flex">
-                                    <button 
-                                        onClick={toggleSpeed}
-                                        disabled={!!activeQuestion}
-                                        className={`z-20 px-4 py-1.5 rounded-lg border-2 font-bold transition-all focus:outline-none disabled:opacity-50 ${playbackRate === 1.25 ? 'bg-amber-500/20 border-amber-400 text-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.3)]' : 'border-slate-500 text-white hover:border-white shadow-[0_0_10px_rgba(255,255,255,0.2)]'}`}
-                                        title="Toggle Speed"
-                                    >
-                                        {playbackRate}x
-                                    </button>
-                                </div>
-
-                                {/* Final Submit Button (If disregarded) */}
-                                {studentAnswers[20] !== undefined && dismissedFinalOverlay && (
-                                    <button 
-                                        onClick={handleFinalSubmit}
-                                        className="z-20 bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold shadow-[0_0_15px_rgba(22,163,74,0.6)] animate-pulse whitespace-nowrap text-xs sm:text-sm border border-green-400 sm:ml-auto ml-auto"
-                                    >
-                                        Save the score to submit
-                                    </button>
-                                )}
-
-                                {/* Fullscreen Button */}
-                                <button 
-                                    onClick={toggleFullscreen}
-                                    className={`text-slate-400 hover:text-white transition-colors focus:outline-none z-20 sm:ml-4 ${studentAnswers[20] !== undefined && dismissedFinalOverlay ? 'ml-2' : 'ml-auto'}`}
-                                    title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-                                >
-                                    {isFullscreen ? (
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
-                                    ) : (
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-                                    )}
-                                </button>
-
-                                <div className="text-base font-medium text-slate-300 font-mono hidden sm:flex items-center gap-4 ml-auto">
-                                    <div className="flex gap-3 text-sm">
-                                        <span className="text-white font-bold tracking-wide">Score: <span className="text-green-400">{calculateScore()}</span> / 20</span>
-                                    </div>
-                                    <span className="opacity-50 mx-2">|</span>
-                                    {formatTime(currentTime)} / {formatTime(MAX_ALLOWED_TIME)}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* RESTART FROM SCRATCH BUTTON */}
-                    {!isFullscreen && (
-                        <div className="w-full flex justify-center mt-2 max-w-5xl z-10">
-                            <button 
-                                onClick={() => setShowResetConfirm(true)}
-                                className="text-slate-400 hover:text-red-400 text-sm font-bold flex items-center gap-2 transition-colors bg-slate-800/50 px-5 py-2.5 rounded-full border border-slate-700 hover:border-red-500/50"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                                Restart Assignment From Scratch
-                            </button>
-                        </div>
-                    )}
-
-                    {/* CONFIRM RESTART MODAL */}
-                    {showResetConfirm && (
-                        <div className="absolute inset-0 bg-slate-900/95 backdrop-blur-sm z-[70] flex flex-col items-center justify-center p-4">
-                            <div className="bg-slate-800 p-8 rounded-2xl border-2 border-red-500 shadow-[0_0_40px_rgba(239,68,68,0.4)] text-center max-w-lg w-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto text-red-500 mb-4 animate-pulse"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                <h2 className="text-3xl font-black text-white mb-4 uppercase">Start From Scratch?</h2>
-                                <p className="text-lg text-slate-300 mb-8 font-medium leading-relaxed">
-                                    This will <strong className="text-red-400">permanently delete</strong> your entire progress, your answers, and the time you have watched so far. You will lose everything and start from the beginning.
-                                </p>
-                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                    <button 
-                                        onClick={() => setShowResetConfirm(false)}
-                                        className="px-6 py-3 rounded-lg font-bold text-white bg-slate-600 hover:bg-slate-500 transition-colors w-full sm:w-auto"
-                                    >
-                                        Cancel, keep watching
-                                    </button>
-                                    <button 
-                                        onClick={executeFullReset}
-                                        className="px-6 py-3 rounded-lg font-bold text-white bg-red-600 hover:bg-red-500 transition-colors w-full sm:w-auto border border-red-400 shadow-[0_0_15px_rgba(239,68,68,0.5)]"
-                                    >
-                                        Yes, I want to restart
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        btnRefresh.addEventListener('click', () => {
+            window.location.reload();
+        });
     </script>
 </body>
 </html>
