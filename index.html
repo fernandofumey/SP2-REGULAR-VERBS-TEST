@@ -268,6 +268,26 @@
             return `${dateStr} ${startTimeStr} - ${endTimeStr}`;
         }
 
+        // Check if start or end time falls outside the period's bell schedule
+        function isOutsideSchedule(period, startDate, endDate) {
+            const schedule = {
+                "1st": { start: 8 * 60 + 56, end: 9 * 60 + 42 },   // 8:56 AM – 9:42 AM
+                "A2":  { start: 9 * 60 + 48, end: 11 * 60 + 19 },  // 9:48 AM – 11:19 AM
+                "B2":  { start: 9 * 60 + 48, end: 11 * 60 + 19 },  // 9:48 AM – 11:19 AM
+                "B3":  { start: 11 * 60 + 25, end: 13 * 60 + 30 }, // 11:25 AM – 1:30 PM
+                "A4":  { start: 13 * 60 + 36, end: 15 * 60 + 7 },  // 1:36 PM – 3:07 PM
+                "5th": { start: 15 * 60 + 13, end: 16 * 60 + 0 }   // 3:13 PM – 4:00 PM
+            };
+
+            const bounds = schedule[period];
+            if (!bounds) return false;
+
+            const startMins = startDate.getHours() * 60 + startDate.getMinutes();
+            const endMins = endDate.getHours() * 60 + endDate.getMinutes();
+
+            return (startMins < bounds.start || startMins > bounds.end || endMins < bounds.start || endMins > bounds.end);
+        }
+
         studentForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const emailVal = emailInput.value.trim().toLowerCase();
@@ -433,6 +453,7 @@
             // Capture the exact moment the test is finished
             let testEndTime = new Date();
             let timeRangeString = formatDateTimeRange(testStartTime, testEndTime);
+            let outOfBounds = isOutsideSchedule(studentData.period, testStartTime, testEndTime);
 
             quizQuestions.forEach((item, idx) => {
                 const uAns = userAnswers[idx];
@@ -464,7 +485,9 @@
                 period: studentData.period,
                 score: `${percentage}% (${scoreCount}/${quizQuestions.length})`,
                 cheatCount: cheatCount,
-                results: resultsSummaryArr.join(' | ') 
+                results: resultsSummaryArr.join(' | '),
+                outsideSchedule: outOfBounds ? "TRUE" : "FALSE",
+                highlightColor: outOfBounds ? "#fef08a" : ""
             };
 
             if (GOOGLE_SHEET_WEB_APP_URL) {
@@ -498,8 +521,8 @@
 
         function downloadCSV(data) {
             const csvContent = "data:text/csv;charset=utf-8," + 
-                "Quiz Title,Date & Duration,First Name,Last Name,Email,Period,Score,Cheating Alerts\n" +
-                `"${data.title}","${data.date}","${data.firstName}","${data.lastName}","${data.email}","${data.period}","${data.score}",${data.cheatCount}`;
+                "Quiz Title,Date & Duration,First Name,Last Name,Email,Period,Score,Cheating Alerts,Outside Schedule\n" +
+                `"${data.title}","${data.date}","${data.firstName}","${data.lastName}","${data.email}","${data.period}","${data.score}",${data.cheatCount},"${data.outsideSchedule}"`;
             
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
