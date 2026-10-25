@@ -439,10 +439,10 @@
                 const isCorrect = uAns === item.correct;
                 if (isCorrect) {
                     scoreCount++;
-                    resultsSummaryArr.push(`question ${idx + 1}: right answer: '${item.correct}'`);
+                    resultsSummaryArr.push(`question ${idx + 1} (${item.q}): right answer: '${item.correct}'`);
                 } else {
                     const wrongAns = uAns !== undefined ? uAns : 'No answer provided';
-                    resultsSummaryArr.push(`question ${idx + 1}: wrong answer: '${wrongAns}'; right answer: '${item.correct}'`);
+                    resultsSummaryArr.push(`question ${idx + 1} (${item.q}): wrong answer: '${wrongAns}'; right answer: '${item.correct}'`);
                 }
             });
 
